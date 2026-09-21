@@ -1,0 +1,50 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Доброй ночи</title>
+
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+        href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@300;400&family=Marck+Script&display=swap"
+        rel="stylesheet"
+    />
+
+    <link rel="stylesheet" href="style.css" />
+</head>
+<body>
+    <canvas id="stars" aria-hidden="true"></canvas>
+
+    <main class="scene">
+        <h1 class="title">Доброй ночи</h1>
+
+        <div class="moon">
+            <svg class="moon-svg" viewBox="0 0 200 200" aria-hidden="true">
+                <defs>
+                    <radialGradient id="moonGrad" cx="35%" cy="30%" r="75%">
+                        <stop offset="0%" stop-color="#fffce8" />
+                        <stop offset="55%" stop-color="#f8ecc0" />
+                        <stop offset="100%" stop-color="#e6cf85" />
+                    </radialGradient>
+
+                    <!-- Маска: большая белая окружность = оставляем,
+                         чёрная поменьше = вырезаем, получается месяц -->
+                    <mask id="crescentMask">
+                        <rect width="200" height="200" fill="black" />
+                        <circle cx="100" cy="100" r="72" fill="white" />
+                        <circle cx="138" cy="100" r="64" fill="black" />
+                    </mask>
+                </defs>
+
+                <circle cx="100" cy="100" r="72" fill="url(#moonGrad)" mask="url(#crescentMask)" />
+            </svg>
+        </div>
+
+        <p class="subtitle">Сладких снов</p>
+    </main>
+
+    <script src="stars.js" defer></script>
+</body>
+</html>

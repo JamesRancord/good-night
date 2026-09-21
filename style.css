@@ -1,0 +1,121 @@
+:root {
+    --sky-top: #0d1236;
+    --sky-mid: #060a22;
+    --sky-bottom: #01020a;
+    --moon-glow: rgba(255, 245, 200, 0.55);
+    --text: #f5f0e0;
+}
+
+* {
+    box-sizing: border-box;
+}
+
+html,
+body {
+    margin: 0;
+    padding: 0;
+    min-height: 100%;
+    background: radial-gradient(
+        ellipse at 50% 40%,
+        var(--sky-top) 0%,
+        var(--sky-mid) 45%,
+        var(--sky-bottom) 100%
+    );
+    color: var(--text);
+    font-family: "Cormorant Garamond", Georgia, serif;
+    overflow-x: hidden;
+}
+
+/* ---------- Звёзды ---------- */
+#stars {
+    position: fixed;
+    inset: 0;
+    width: 100%;
+    height: 100%;
+    display: block;
+    z-index: 1;
+    pointer-events: none;
+}
+
+/* ---------- Сцена ---------- */
+.scene {
+    position: relative;
+    z-index: 2;
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: clamp(20px, 5vh, 56px);
+    padding: 6vh 5vw;
+    text-align: center;
+    pointer-events: none;
+}
+
+/* ---------- Заголовок ---------- */
+.title {
+    font-family: "Cormorant Garamond", Georgia, serif;
+    font-weight: 300;
+    font-size: clamp(36px, 8vmin, 78px);
+    letter-spacing: 0.14em;
+    margin: 0;
+    color: var(--text);
+    text-shadow:
+        0 0 18px rgba(255, 245, 210, 0.45),
+        0 0 46px rgba(255, 245, 210, 0.22),
+        0 0 90px rgba(180, 200, 255, 0.15);
+    animation: appear 2.4s ease-out both;
+}
+
+/* ---------- Месяц ---------- */
+.moon {
+    width: clamp(170px, 40vmin, 320px);
+    height: clamp(170px, 40vmin, 320px);
+    animation: float 7s ease-in-out infinite;
+    will-change: transform;
+}
+
+.moon-svg {
+    width: 100%;
+    height: 100%;
+    display: block;
+    rotate: -18deg;                     /* ← наклон месяца */
+    filter:
+        drop-shadow(0 0 22px var(--moon-glow))
+        drop-shadow(0 0 70px rgba(255, 245, 200, 0.28))
+        drop-shadow(0 0 140px rgba(255, 245, 200, 0.14));
+    animation: appear 3s ease-out 0.2s both;
+}
+
+/* ---------- Подпись ---------- */
+.subtitle {
+    font-family: "Marck Script", cursive;
+    font-size: clamp(28px, 6vmin, 56px);
+    margin: 0;
+    color: var(--text);
+    text-shadow:
+        0 0 16px rgba(255, 245, 210, 0.45),
+        0 0 40px rgba(255, 245, 210, 0.2);
+    animation: appear 2.4s ease-out 0.6s both;
+}
+
+/* ---------- Анимации ---------- */
+@keyframes float {
+    0%, 100% { transform: translateY(0); }
+    50%      { transform: translateY(-16px); }
+}
+
+@keyframes appear {
+    from { opacity: 0; transform: translateY(14px); }
+    to   { opacity: 1; transform: translateY(0); }
+}
+
+/* Уважаем настройки доступности */
+@media (prefers-reduced-motion: reduce) {
+    .moon,
+    .moon-svg,
+    .title,
+    .subtitle {
+        animation: none;
+    }
+}
