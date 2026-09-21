@@ -13,7 +13,7 @@
     let stars = [];
     const comets = [];
 
-    // Тайминг комет: раз в ~30 секунд, с небольшим разбросом
+    // Тайминг комет: раз в ~10 секунд, с небольшим разбросом
     const COMET_INTERVAL_MIN = 5000; // 5 сек
     const COMET_INTERVAL_MAX = 10000; // 10 сек
     let nextCometAt = 0;
@@ -70,8 +70,8 @@
             y: startY,
             vx: dirX * speed * rand(0.75, 1),
             vy: speed * rand(0.55, 0.9),
-            // Длина хвоста в пикселях — визуально красиво от 90 до 200
-            tail: rand(90, 200),
+            // Длина хвоста в пикселях — визуально красиво от 350 до 400
+             tail: rand(350, 400),
             life: 1,
             decay: rand(0.006, 0.012),
         });
@@ -188,9 +188,9 @@
     if (prefersReduced) {
         drawStatic();
     } else {
-        // Первую комету пускаем через 5–10 секунд после загрузки,
+        // Первую комету пускаем через 10–15 секунд после загрузки,
         // чтобы посетитель её точно увидел
-        setTimeout(() => spawnComet(), rand(5000, 10000));
+        setTimeout(() => spawnComet(), rand(10000, 15000));
         requestAnimationFrame(draw);
     }
 })();
