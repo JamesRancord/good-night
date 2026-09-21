@@ -20,7 +20,8 @@
     <main class="scene">
         <h1 class="title">Доброй ночи, Арина</h1>
 
-        <div class="moon">
+        <div class="moon" id="moon" role="button" tabindex="0" aria-label="Нажми на месяц">
+            <div class="moon-glow" aria-hidden="true"></div>
             <svg class="moon-svg" viewBox="0 0 200 200" aria-hidden="true">
                 <defs>
                     <radialGradient id="moonGrad" cx="35%" cy="30%" r="75%">
@@ -28,21 +29,20 @@
                         <stop offset="55%" stop-color="#f8ecc0" />
                         <stop offset="100%" stop-color="#e6cf85" />
                     </radialGradient>
-
-                    <!-- Маска: большая белая окружность = оставляем,
-                         чёрная поменьше = вырезаем, получается месяц -->
                     <mask id="crescentMask">
                         <rect width="200" height="200" fill="black" />
                         <circle cx="100" cy="100" r="72" fill="white" />
                         <circle cx="138" cy="100" r="64" fill="black" />
                     </mask>
                 </defs>
-
                 <circle cx="100" cy="100" r="72" fill="url(#moonGrad)" mask="url(#crescentMask)" />
             </svg>
         </div>
 
-        <p class="subtitle">Самых сладких снов</p>
+        <div class="bottom-text">
+            <p class="subtitle">Самых сладких снов</p>
+            <div class="continue-hint" id="continueHint" aria-live="polite">Продолжай</div>
+        </div>
     </main>
 
     <script src="stars.js" defer></script>
