@@ -69,25 +69,64 @@ body {
 
 /* ---------- Месяц ---------- */
 .moon {
+    position: relative;
     width: clamp(170px, 40vmin, 320px);
     height: clamp(170px, 40vmin, 320px);
+    cursor: pointer;
+    pointer-events: auto;
     animation: float 7s ease-in-out infinite;
     will-change: transform;
+    -webkit-tap-highlight-color: transparent;
+    outline: none;
+}
+
+.moon:focus-visible {
+    outline: 2px solid rgba(255, 245, 200, 0.6);
+    outline-offset: 12px;
+    border-radius: 50%;
+}
+
+.moon-glow {
+    position: absolute;
+    inset: -55%;
+    border-radius: 50%;
+    pointer-events: none;
+    z-index: 0;
+    background: radial-gradient(
+        circle at center,
+        rgba(255, 245, 200, 0.55) 0%,
+        rgba(255, 245, 200, 0.25) 18%,
+        rgba(255, 245, 200, 0.10) 35%,
+        rgba(255, 245, 200, 0.03) 55%,
+        rgba(255, 245, 200, 0) 75%
+    );
+    animation: glowPulse 5s ease-in-out infinite;
+}
+
+@keyframes glowPulse {
+    0%, 100% { opacity: 0.85; transform: scale(1); }
+    50%      { opacity: 1;    transform: scale(1.06); }
 }
 
 .moon-svg {
+    position: relative;
+    z-index: 1;
     width: 100%;
     height: 100%;
     display: block;
-    rotate: -18deg;                     /* ← наклон месяца */
-    filter:
-        drop-shadow(0 0 22px var(--moon-glow))
-        drop-shadow(0 0 70px rgba(255, 245, 200, 0.28))
-        drop-shadow(0 0 140px rgba(255, 245, 200, 0.14));
+    rotate: -18deg;
     animation: appear 3s ease-out 0.2s both;
 }
 
-/* ---------- Подпись ---------- */
+/* ---------- Блок подписей под месяцем ---------- */
+.bottom-text {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: clamp(10px, 2vh, 20px);
+}
+
+/* ---------- Подпись «Самых сладких снов» ---------- */
 .subtitle {
     font-family: "Marck Script", cursive;
     font-size: clamp(28px, 6vmin, 56px);
@@ -98,8 +137,52 @@ body {
         0 0 40px rgba(255, 245, 210, 0.2);
     animation: appear 2.4s ease-out 0.6s both;
 }
+/* ---------- Надпись «Продолжай» ---------- */
+.continue-hint {
+    font-family: "Marck Script", cursive;
+    font-weight: 400;
+    font-size: clamp(26px, 5.5vmin, 48px);
+    margin: 0;
+    color: var(--text);
+    text-shadow:
+        0 0 16px rgba(255, 245, 210, 0.55),
+        0 0 40px rgba(255, 245, 210, 0.25);
+    opacity: 0;
+    transform: translateY(-8px) scale(0.96);
+    /* Мягкое появление: 1.2 секунды, easeOutQuint */
+    transition:
+        opacity 1.2s cubic-bezier(0.22, 1, 0.36, 1),
+        transform 1.2s cubic-bezier(0.22, 1, 0.36, 1);
+    pointer-events: none;
+    text-align: center;
+    line-height: 1.1;
+    min-height: 1em;
+    /* Никакого uppercase — рукописный шрифт в капсе смотрится плохо */
+}
 
-/* ---------- Анимации ---------- */
+.continue-hint.visible {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+    /* Пульсация включается через 1.3 сек, когда появление закончилось.
+       Анимирует только transform, opacity не трогает — не перебивает transition. */
+    animation: continuePulse 2.6s ease-in-out 1.3s infinite;
+}
+
+@keyframes continuePulse {
+    0%, 100% { transform: translateY(0) scale(1); }
+    50%      { transform: translateY(0) scale(1.04); }
+}
+@keyframes continuePulse {
+    0%, 100% { transform: translateY(0) scale(1); }
+    50%      { transform: translateY(0) scale(1.04); }
+}
+
+@keyframes continuePulse {
+    0%, 100% { transform: scale(1);    opacity: 0.88; }
+    50%      { transform: scale(1.04); opacity: 1; }
+}
+
+/* ---------- Анимации появления ---------- */
 @keyframes float {
     0%, 100% { transform: translateY(0); }
     50%      { transform: translateY(-16px); }
@@ -113,9 +196,11 @@ body {
 /* Уважаем настройки доступности */
 @media (prefers-reduced-motion: reduce) {
     .moon,
+    .moon-glow,
     .moon-svg,
     .title,
-    .subtitle {
+    .subtitle,
+    .continue-hint.visible {
         animation: none;
     }
 }
