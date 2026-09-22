@@ -22,7 +22,9 @@
 
         <div class="moon" id="moon" role="button" tabindex="0" aria-label="Нажми на месяц">
             <div class="moon-glow" aria-hidden="true"></div>
-            <svg class="moon-svg" viewBox="0 0 200 200" aria-hidden="true">
+
+            <!-- Месяц -->
+            <svg class="moon-svg moon-svg--moon" viewBox="0 0 200 200" aria-hidden="true">
                 <defs>
                     <radialGradient id="moonGrad" cx="35%" cy="30%" r="75%">
                         <stop offset="0%" stop-color="#fffce8" />
@@ -37,13 +39,30 @@
                 </defs>
                 <circle cx="100" cy="100" r="72" fill="url(#moonGrad)" mask="url(#crescentMask)" />
             </svg>
+
+            <!-- Сердце (появляется после 812 кликов) -->
+            <svg class="moon-svg moon-svg--heart" viewBox="0 0 200 200" aria-hidden="true">
+                <defs>
+                    <radialGradient id="heartGrad" cx="35%" cy="30%" r="75%">
+                        <stop offset="0%" stop-color="#ffc8d6" />
+                        <stop offset="55%" stop-color="#ff6b8a" />
+                        <stop offset="100%" stop-color="#c9184a" />
+                    </radialGradient>
+                </defs>
+                <path
+                    d="M100,176 C40,128 8,90 8,58 C8,30 30,8 58,8 C78,8 92,20 100,38 C108,20 122,8 142,8 C170,8 192,30 192,58 C192,90 160,128 100,176 Z"
+                    fill="url(#heartGrad)"
+                />
+            </svg>
         </div>
 
         <div class="bottom-text">
-            <p class="subtitle">Самых сладких и приятных снов</p>
-            <div class="continue-hint" id="continueHint" aria-live="polite">Мы все еще в игре</div>
+            <p class="subtitle">Самых сладких снов</p>
+            <div class="continue-hint" id="continueHint" aria-live="polite"></div>
         </div>
     </main>
+
+    <div class="click-counter" id="clickCounter" aria-label="Счётчик кликов">0</div>
 
     <script src="stars.js" defer></script>
 </body>
