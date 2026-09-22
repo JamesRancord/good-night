@@ -9,7 +9,30 @@
 
     const moonEl = document.getElementById("moon");
     const continueHint = document.getElementById("continueHint");
+    const clickCounter = document.getElementById("clickCounter");
 
+    // ---------- localStorage ----------
+    const STORAGE_KEY = "good-night-total-clicks";
+
+    function loadTotalClicks() {
+        try {
+            const raw = localStorage.getItem(STORAGE_KEY);
+            const n = parseInt(raw, 10);
+            return Number.isFinite(n) && n >= 0 ? n : 0;
+        } catch (e) {
+            return 0;
+        }
+    }
+
+    function saveTotalClicks(value) {
+        try {
+            localStorage.setItem(STORAGE_KEY, String(value));
+        } catch (e) {
+            /* приватный режим — игнорируем */
+        }
+    }
+
+    // ---------- Состояние ----------
     let width = 0;
     let height = 0;
     let dpr = 1;
@@ -24,6 +47,10 @@
     let collisionTriggered = false;
     let heartsTriggered = false;
     let countingPaused = false;
+
+    let totalClicks = loadTotalClicks();
+    const MILESTONE_241 = 241;
+    const MILESTONE_812 = 812;
 
     const COMET_INTERVAL_MIN = 25000;
     const COMET_INTERVAL_MAX = 40000;
@@ -243,7 +270,8 @@
         }
     }
 
-    // ---------- Взрыв ----------
+    // ---------- Взрывы ----------
+    // Большой взрыв — от столкновения двух звёзд
     function createExplosion(cx, cy) {
         explosions.push({
             x: cx, y: cy, vx: 0, vy: 0,
@@ -265,6 +293,24 @@
                 decay: rand(0.007, 0.018),
                 color: ["#fff5cc", "#ffd166", "#ffe0a8", "#ffffff", "#ffb86b"][(Math.random() * 5) | 0],
                 size: rand(1.5, 3.5),
+            });
+        }
+    }
+
+    // Мини-взрыв — для фейерверка на каждой звёздочке
+    function createMiniExplosion(cx, cy) {
+        const count = 12;
+        for (let i = 0; i < count; i++) {
+            const angle = Math.random() * Math.PI * 2;
+            const speed = rand(0.8, 4.5);
+            explosions.push({
+                x: cx, y: cy,
+                vx: Math.cos(angle) * speed,
+                vy: Math.sin(angle) * speed,
+                life: 1,
+                decay: rand(0.012, 0.028),
+                color: ["#fff5cc", "#ffd166", "#ffe0a8", "#ffffff", "#ffb86b", "#ff9ec4"][(Math.random() * 6) | 0],
+                size: rand(1, 2.4),
             });
         }
     }
@@ -306,28 +352,79 @@
         ctx.globalAlpha = 1;
     }
 
-    // ---------- Надпись «Продолжай» ----------
-    // Появляется через 1 сек, мягко проявляется 1.2 сек, держится 3 сек.
-    // После появления — разблокирует счётчик кликов и обнуляет его.
-    function showContinue() {
+    // ---------- Сообщения ----------
+    // Универсальная функция для показа текста в .continue-hint.
+    function showMessage(text, options = {}) {
+        const {
+            appearDelay = 1000,
+            visibleFor = 3000,
+            isMilestone = false,
+            onAppearComplete = null,
+        } = options;
+
         if (!continueHint) return;
 
-        const appearDelay = 1000;
-        const fadeDuration = 1200;
-        const visibleFor = 3000;
+        // Сбрасываем предыдущее состояние, чтобы переход сработал заново
+        continueHint.classList.remove("visible", "milestone");
+        if (isMilestone) continueHint.classList.add("milestone");
 
         setTimeout(() => {
+            continueHint.textContent = text;
             continueHint.classList.add("visible");
 
-            setTimeout(() => {
-                countingPaused = false;
-                moonClicks = 0;
-            }, fadeDuration);
+            if (typeof onAppearComplete === "function") {
+                setTimeout(onAppearComplete, 1200);
+            }
 
             setTimeout(() => {
                 continueHint.classList.remove("visible");
             }, visibleFor);
         }, appearDelay);
+    }
+
+    // "Продолжай" — при столкновении
+    function showContinue() {
+        showMessage("Продолжай", {
+            appearDelay: 1000,
+            visibleFor: 3000,
+            onAppearComplete: () => {
+                countingPaused = false;
+                moonClicks = 0;
+            },
+        });
+    }
+
+    // Рубеж 241
+    function triggerMilestone241() {
+        showMessage("Ты молодец, но это ещё не всё", {
+            appearDelay: 400,
+            visibleFor: 4500,
+            isMilestone: true,
+        });
+    }
+
+    // Рубеж 812
+    function triggerMilestone812() {
+        showMessage("Твоё упорство поистине поражает", {
+            appearDelay: 400,
+            visibleFor: 5500,
+            isMilestone: true,
+        });
+
+        // Луна → сердце
+        if (moonEl) moonEl.classList.add("heart-mode");
+
+        // Фейерверк на каждой звёздочке — с разбросом по времени,
+        // чтобы всё не рвануло за один кадр.
+        triggerStarFireworks();
+    }
+
+    function triggerStarFireworks() {
+        const positions = stars.map((s) => ({ x: s.x, y: s.y }));
+        for (const pos of positions) {
+            const delay = Math.random() * 1200;
+            setTimeout(() => createMiniExplosion(pos.x, pos.y), delay);
+        }
     }
 
     // ---------- Сердечко на canvas ----------
@@ -403,10 +500,42 @@
         ctx.globalAlpha = 1;
     }
 
+    // ---------- Счётчик ----------
+    function updateCounterDisplay() {
+        if (clickCounter) clickCounter.textContent = String(totalClicks);
+    }
+
+    function bumpTotalClicks() {
+        totalClicks++;
+        saveTotalClicks(totalClicks);
+        updateCounterDisplay();
+
+        if (totalClicks === MILESTONE_241) {
+            triggerMilestone241();
+        }
+        if (totalClicks === MILESTONE_812) {
+            triggerMilestone812();
+        }
+    }
+
+    // Восстановление визуального состояния при загрузке
+    // (если пользователь уже прошёл 812, луна должна быть сердцем).
+    function applyPersistedState() {
+        updateCounterDisplay();
+        if (totalClicks >= MILESTONE_812 && moonEl) {
+            moonEl.classList.add("heart-mode");
+        }
+    }
+
     // ---------- Клик по месяцу ----------
     function handleMoonClick() {
+        // Кометы всегда — визуальный отклик
         spawnCometsFromMoon();
 
+        // Глобальный счётчик всегда растёт (даже во время "паузы")
+        bumpTotalClicks();
+
+        // Локальный счётчик (для 20 / 40) — только когда не на паузе
         if (countingPaused) return;
 
         moonClicks++;
@@ -435,6 +564,7 @@
     // ---------- Старт ----------
     window.addEventListener("resize", resize);
     resize();
+    applyPersistedState();
 
     if (prefersReduced) {
         drawStatic();
